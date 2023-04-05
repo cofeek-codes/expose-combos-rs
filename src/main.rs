@@ -73,7 +73,7 @@ fn main() {
     let mut global: Vec<Vec<i32>> = Vec::new();
     println!("cpc: {}", count_possible_combinations(&mut input));
 
-    while global.len() < count_possible_combinations(&mut input) {
+    while global.len() < 6 {
         let combination = generate_combination(&input);
         if !global.contains(&combination) {
             global.push(combination);
