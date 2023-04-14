@@ -41,11 +41,11 @@ fn count_possible_combinations(n: usize, m: usize) -> Option<usize> {
     } else if m == 1 {
         Some(1)
     } else {
-        let mut i = 1;
+        let mut i = 0;
         let mut del = 1;
         let mut oldn = factorial(n);
 
-        while i < m {
+        while i <= (n - m) {
             oldn = oldn / del;
             del = del + 1;
             i = i + 1;
@@ -80,5 +80,5 @@ fn main() {
     //     }
     // }
     // println!("global: {:?}", global);
-    println!("{:?}", count_possible_combinations(5, 4));
+    println!("{:?}", count_possible_combinations(5, 3).unwrap());
 }
