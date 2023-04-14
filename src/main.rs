@@ -1,28 +1,8 @@
-use std::{collections::HashMap, process::exit};
+use std::process::exit;
 
-use rand::seq::SliceRandom;
+use rand::Rng;
 
-fn generate_combination(input: &Vec<i32>) -> Vec<i32> {
-    let mut output: Vec<i32> = Vec::new();
-    while output.len() < input.len() {
-        let i: i32 = *input.choose(&mut rand::thread_rng()).unwrap();
-        if !output.contains(&i) {
-            output.push(i);
-        }
-    }
-    return output;
-}
-
-fn combos_cmp(a: Vec<i32>, b: Vec<i32>) -> bool {
-    let cmp = a.iter().zip(&b).filter(|&(a, b)| a == b).count();
-
-    if cmp == b.len() {
-        true
-    } else {
-        false
-    }
-}
-
+// math
 fn factorial(num: usize) -> usize {
     match num {
         0 => 1,
@@ -31,29 +11,42 @@ fn factorial(num: usize) -> usize {
     }
 }
 
-pub fn contains_duplicate(vec: &Vec<usize>) -> bool {
-    let mut map = HashMap::<usize, usize>::new();
-    for (i, num) in vec.iter().enumerate() {
-        match map.contains_key(num) {
-            true => return true,
-            false => map.insert(*num, i),
-        };
+// math
+fn count_unique(input: &Vec<usize>) -> usize {
+    let mut tmpd: Vec<usize> = Vec::new();
+
+    for el in input {
+        if !tmpd.contains(el) {
+            tmpd.push(*el);
+        }
     }
-    false
+    tmpd.len()
+}
+fn multiply_unique(n: usize, m: usize) -> usize {
+    let mut res = 1;
+    let mut i = 1;
+    while i < (n - m) + 1 {
+        res = res * i;
+        i = i + 1;
+    }
+    res
+}
+fn count_possible_combinations(n: usize, m: usize) -> usize {
+    return factorial(n) / multiply_unique(n, m);
 }
 
-fn count_possible_combinations(input: &mut Vec<i32>) -> usize {
-    let c = input.clone();
+fn join_usize(a: &Vec<usize>) -> usize {
+    let mut t: Vec<String> = Vec::new();
+    for el in a {
+        t.push(el.to_string());
+    }
+    let l = t.join("");
 
-    input.dedup();
-
-    let same = (c.len() - input.len()) + 1;
-
-    return factorial(same);
+    return l.parse::<usize>().unwrap();
 }
 
 fn main() {
-    let mut input: Vec<i32> = Vec::new();
+    let mut input: Vec<usize> = Vec::new();
 
     let args = match std::env::args().nth(1) {
         Some(args) => args,
@@ -64,20 +57,45 @@ fn main() {
     };
 
     for e in args.split("") {
-        match e.parse::<i32>() {
+        match e.parse::<usize>() {
             Ok(iel) => input.push(iel),
             Err(_) => {}
         }
     }
 
-    let mut global: Vec<Vec<i32>> = Vec::new();
-    println!("cpc: {}", count_possible_combinations(&mut input));
+    let count_chars = input.len();
+    let count_unique_of_input = count_unique(&input);
+    let multiply = multiply_unique(count_chars, count_unique_of_input);
+    let combo_count = factorial(count_chars) / multiply;
+    // main
 
-    while global.len() < 6 {
-        let combination = generate_combination(&input);
-        if !global.contains(&combination) {
-            global.push(combination);
+    // output
+    let mut global: Vec<usize> = Vec::new();
+
+    global.push(join_usize(&input));
+    while global.len() < combo_count {
+        let mut num: Vec<usize> = Vec::new();
+        num.resize(count_chars, 0);
+        let mut input1 = input.clone();
+        let mut i = 0;
+        let mut ran = 0;
+        while i < num.len() {
+            if input1.len() != 0 {
+                ran = rand::thread_rng().gen_range(0..input1.len());
+            } else {
+                ran = 0;
+            }
+            num[i] = input1[ran];
+
+            input1.remove(ran);
+
+            i = i + 1;
+        }
+        if !global.contains(&join_usize(&num)) {
+            global.push(join_usize(&num));
         }
     }
     println!("global: {:?}", global);
+
+    // main
 }
