@@ -95,7 +95,11 @@ fn main() {
             global.push(join_usize(&num));
         }
     }
-    println!("global: {:?}", global);
+    for el in global.iter().enumerate() {
+        let mut i = el.0 + 1;
+        println!("{}: {}", i, el.1);
+        i = i + 1;
+    }
 
     // main
 }
